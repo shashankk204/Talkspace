@@ -19,23 +19,25 @@ export const Receiver = () => {
 
         const pc = new RTCPeerConnection();
         pc.ontrack = (event) => {
+            console.log(event);
             video.srcObject = new MediaStream([event.track]);
             video.play();
         }
 
         socket.onmessage = (event) => {
             const message = JSON.parse(event.data);
-            if (message.type === 'createOffer') {
+            if (message.type === 'createOffer'&& message.for==="receiver") {
                 pc.setRemoteDescription(message.sdp).then(() => {
                     pc.createAnswer().then((answer) => {
                         pc.setLocalDescription(answer);
                         socket.send(JSON.stringify({
+                            for:"sender",
                             type: 'createAnswer',
                             sdp: answer
                         }));
                     });
                 });
-            } else if (message.type === 'iceCandidate') {
+            } else if (message.type === 'iceCandidate'&& message.for==="receiver") {
                 pc.addIceCandidate(message.candidate);
             }
         }

@@ -23,9 +23,9 @@ export const Sender = () => {
 
         socket.onmessage = async (event) => {
             const message = JSON.parse(event.data);
-            if (message.type === 'createAnswer') {
+            if (message.type === 'createAnswer' && message.for==="sender") {
                 await pc.setRemoteDescription(message.sdp);
-            } else if (message.type === 'iceCandidate') {
+            } else if (message.type === 'iceCandidate' && message.for==="sender") {
                 pc.addIceCandidate(message.candidate);
             }
         }
@@ -35,6 +35,7 @@ export const Sender = () => {
         pc.onicecandidate = (event) => {
             if (event.candidate) {
                 socket?.send(JSON.stringify({
+                    for:"receiver",
                     type: 'iceCandidate',
                     candidate: event.candidate
                 }));
@@ -42,9 +43,11 @@ export const Sender = () => {
         }
 
         pc.onnegotiationneeded = async () => {
+            console.error("onnegotiateion needed");
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
             socket?.send(JSON.stringify({
+                for:"receiver",
                 type: 'createOffer',
                 sdp: pc.localDescription
             }));
@@ -61,6 +64,9 @@ export const Sender = () => {
             // this is wrong, should propogate via a component
             document.body.appendChild(video);
             stream.getTracks().forEach((track) => {
+                console.error("track added");
+                console.log(track);
+                console.log(pc);
                 pc?.addTrack(track);
             });
         });

@@ -3,49 +3,66 @@ import WebSocket,{WebSocketServer} from "ws";
 import http from "http";
 import { onSocketError } from "../utils/handleSocketError.js";
 import { RoomManager } from "./managers/room.manager.js";
-import { User } from "./managers/user.manager.js";
-
+import { User } from "./managers/room.manager.js";
+import cors from 'cors'
 
 const app = express();
+app.use(cors());
 const server = http.createServer(app);
-// const wss = new WebSocketServer ({server});
-
-
 const wss=new WebSocketServer({noServer:true});
 
 
 
-let senderSocket: null | WebSocket = null;
-let receiverSocket: null | WebSocket = null;
+let a:number=1;
+// const socketIDOf=Map<String,WebSocket>;
+// const room
+const rooms=new RoomManager();
 
-wss.on('connection', function connection(ws) {
-    ws.on('error', console.error);
+
+wss.on("connection",(ws:WebSocket,req)=>{
+    
+    console.log(a);
+    let u:User={
+        name:a++,
+        socket:ws
+    }
+    rooms.addtoRoom(u,"1");
+    
+
+})
+
+
+
+// let senderSocket: null | WebSocket = null;
+// let receiverSocket: null | WebSocket = null;
+// wss.on('connection', function connection(ws) {
+//     ws.on('error', console.error);
   
-    ws.on('message', function message(data: any) {
-      const message = JSON.parse(data);
-      if (message.type === 'sender') {
-        senderSocket = ws;
-      } else if (message.type === 'receiver') {
-        receiverSocket = ws;
-      } else if (message.type === 'createOffer') {
-        if (ws !== senderSocket) {
-          return;
-        }
-        receiverSocket?.send(JSON.stringify({ type: 'createOffer', sdp: message.sdp }));
-      } else if (message.type === 'createAnswer') {
-          if (ws !== receiverSocket) {
-            return;
-          }
-          senderSocket?.send(JSON.stringify({ type: 'createAnswer', sdp: message.sdp }));
-      } else if (message.type === 'iceCandidate') {
-        if (ws === senderSocket) {
-          receiverSocket?.send(JSON.stringify({ type: 'iceCandidate', candidate: message.candidate }));
-        } else if (ws === receiverSocket) {
-          senderSocket?.send(JSON.stringify({ type: 'iceCandidate', candidate: message.candidate }));
-        }
-      }
-    });
-  });
+//     ws.on('message', function message(data: any) {
+//       const message = JSON.parse(data);
+//       if (message.type === 'sender') {
+//         senderSocket = ws;
+//       } else if (message.type === 'receiver') {
+//         receiverSocket = ws;
+//       } else if (message.type === 'createOffer') {
+//         if (ws !== senderSocket) {
+//           return;
+//         }
+//         receiverSocket?.send(JSON.stringify({ type: 'createOffer', sdp: message.sdp }));
+//       } else if (message.type === 'createAnswer') {
+//           if (ws !== receiverSocket) {
+//             return;
+//           }
+//           senderSocket?.send(JSON.stringify({ type: 'createAnswer', sdp: message.sdp }));
+//       } else if (message.type === 'iceCandidate') {
+//         if (ws === senderSocket) {
+//           receiverSocket?.send(JSON.stringify({ type: 'iceCandidate', candidate: message.candidate }));
+//         } else if (ws === receiverSocket) {
+//           senderSocket?.send(JSON.stringify({ type: 'iceCandidate', candidate: message.candidate }));
+//         }
+//       }
+//     });
+//   });
 
 
 server.on("upgrade",(req,socket,head)=>{
@@ -66,5 +83,31 @@ server.on("upgrade",(req,socket,head)=>{
 
 })
 
+// wss.on("connection",(ws:WebSocket,req:http.IncomingMessage)=>{
 
+    
+//     console.log('New client connected');
+//     //@ts-ignore
+    
+//     ws.on("message",(data)=>{
+//         console.log(`message recieved from `);
+//         wss.clients.forEach((client:WebSocket)=>{
+        
+//         console.log(client===ws);
+        
+        
+//         if(client !==ws && client.readyState===WebSocket.OPEN)
+//         {
+//             client.send(data,{binary:false});
+//         }
+//        })
+//     })
+
+
+
+//     ws.on('close', () => {
+//         console.log('Client disconnected');
+//       });
+
+// })
 export {app,server,wss};
