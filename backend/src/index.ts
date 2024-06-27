@@ -1,14 +1,9 @@
 import express from "express";
-
-
-const app= express();
-app.get("/",(req,res)=>{
-    res.send("<h1>hello world</h1>")
-})
+import { app, server } from "./socket/socket.js";
 
 
 
-app.listen(5000,()=>{
+server.listen(5000,()=>{
     console.log("listening to port 5000");
     
 })
