@@ -58,6 +58,9 @@ export const Room = () => {
       } catch (err) {
         console.log("Error occurred at login: ", err);
       }
+        channel.on("MemberJoined", handleUserJoin);
+        client.on("MessageFromPeer", handleMessageFromPeer);
+        channel.on("MemberLeft", handleUserLeft);
 
       
       try {
@@ -70,9 +73,6 @@ export const Room = () => {
           localVideoRef.current.srcObject = videoStreamonly;
           console.log("this ran");
           
-          channel.on("MemberJoined", handleUserJoin);
-          client.on("MessageFromPeer", handleMessageFromPeer);
-          channel.on("MemberLeft", handleUserLeft);
         }
       } catch (error) {
         console.log("Error accessing local media: ", error);
