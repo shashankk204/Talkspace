@@ -59,15 +59,20 @@ export const Room = () => {
         console.log("Error occurred at login: ", err);
       }
 
-      channel.on("MemberJoined", handleUserJoin);
-      client.on("MessageFromPeer", handleMessageFromPeer);
-      channel.on("MemberLeft", handleUserLeft);
-
+      
       try {
         localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        // console.log("local",localStream);
         if (localVideoRef.current) {
-          const videoStreamonly=new MediaStream([localStream.getVideoTracks()[0]])
+          const videoStreamonly=new MediaStream([localStream.getVideoTracks()[0]]);
+          // console.log("video",videoStreamonly);
+          
           localVideoRef.current.srcObject = videoStreamonly;
+          console.log("this ran");
+          
+          channel.on("MemberJoined", handleUserJoin);
+          client.on("MessageFromPeer", handleMessageFromPeer);
+          channel.on("MemberLeft", handleUserLeft);
         }
       } catch (error) {
         console.log("Error accessing local media: ", error);
@@ -87,7 +92,7 @@ export const Room = () => {
   }, []);
 
   const handleUserJoin = async (MemberId: string) => {
-    createOffer(MemberId);
+    await createOffer(MemberId);
   };
 
   const handleMessageFromPeer = async (message: any, MemberId: string) => {
@@ -139,16 +144,30 @@ export const Room = () => {
         localVideoRef.current.classList.add("smallFrame");
       }
     }
+    
+    // await waitForLocalStream()
+    console.log("hahahaha",localStream)
+    localStream.getTracks().forEach((track) => {
+        console.log("localTrack", track);
+        
+        peerConnection.addTrack(track, localStream);
+      });
+    
+    // localStream?.getTracks().forEach((track) => {
+    //   console.log("localtarck",track)
+    //   peerConnection.addTrack(track, localStream);
+    // });
 
-    localStream?.getTracks().forEach((track) => {
-      peerConnection.addTrack(track, localStream);
-    });
-
+    // const s=setInterval(()=>{
+      
+    // },1000);
+    
     peerConnection.ontrack = (event) => {
+      // clearInterval(s);
+      console.log("reomte",event)
       event.streams[0].getTracks().forEach((track) => {
         remoteStream.addTrack(track);
-      });
-    };
+      });};
 
     peerConnection.onicecandidate = async (event) => {
       if (event.candidate) {
@@ -164,9 +183,11 @@ export const Room = () => {
       }
     };
   };
+  
+
 
   const createOffer = async (MemberId: string) => {
-    createPeerConnection(MemberId);
+    await createPeerConnection(MemberId);
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
     await client.sendMessageToPeer(
