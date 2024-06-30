@@ -22,7 +22,7 @@ export const useSignup = () => {
     setError(null);
     console.log(JSON.stringify({ email, password }));
 
-    const response = await fetch("http://localhost:3000/user/signup", {
+    const response = await fetch("api/user/signup", {
       //   mode: "no-cors",
       method: "POST",
       headers: { "Content-Type": "application/json" },
