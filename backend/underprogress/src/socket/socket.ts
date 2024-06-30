@@ -21,12 +21,7 @@ const rooms=new RoomManager();
 
 wss.on("connection",(ws:WebSocket,req)=>{
     
-    console.log(a);
-    let u:User={
-        name:a++,
-        socket:ws
-    }
-    rooms.addtoRoom(u,"1");
+    
     
 
 })
