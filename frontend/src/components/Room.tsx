@@ -92,6 +92,12 @@ export const Room = () => {
   }, []);
 
   const handleUserJoin = async (MemberId: string) => {
+    function wait(ms:number) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    
+    // Usage
+    await wait(10000)
     await createOffer(MemberId);
   };
 
@@ -182,6 +188,8 @@ export const Room = () => {
         );
       }
     };
+    
+
   };
   
 
